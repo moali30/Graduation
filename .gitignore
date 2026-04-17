@@ -1,0 +1,7 @@
+__pycache__
+*.pyc
+.env
+.venv
+venv/
+function_id.txt
+code.tar.gz

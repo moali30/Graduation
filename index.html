@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التحليل الإحصائي لمشاريع التخرج</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css?v=3">
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="background-effects">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="glass-nav">
+        <div class="nav-content">
+            <div class="logo">
+                <i class="fas fa-chart-pie accent-color"></i>
+                <span data-i18n="app_title">التحليل الإحصائي لمشاريع التخرج</span>
+            </div>
+            <div class="nav-actions">
+                <span class="text-muted" data-i18n="dev_name" style="font-size: 0.9em; margin-inline-end: 15px;">أخوكم محمد عاصم</span>
+                <button id="lang-toggle" class="btn-icon" title="تغيير اللغة">AR/EN</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="container">
+        
+        <!-- Hero Section -->
+        <section id="hero-section" class="active fade-in">
+            <div class="hero-content">
+                <h1 data-i18n="app_title">التحليل الإحصائي لمشاريع التخرج</h1>
+                <p data-i18n="app_desc" class="subtitle">أداة احترافية لتحليل استبيانات الأبحاث العلمية بنقرة واحدة</p>
+                <div style="margin: 15px 0 30px 0;">
+                    <span data-i18n="hero_dev" style="font-family: 'Inter', 'Cairo', sans-serif; font-size: 1.1rem; font-weight: 600; padding: 8px 24px; border-radius: 50px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; display: inline-block; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.15);">أخوكم محمد عاصم</span>
+                </div>
+                <button id="start-btn" class="btn-primary btn-large">
+                    <span data-i18n="start_button">ابدأ تحليلاً جديداً</span>
+                    <i class="fas fa-arrow-left arrow-icon"></i>
+                </button>
+            </div>
+            
+            <!-- Features Cards -->
+            <div class="features-grid">
+                <div class="feature-card glass-card">
+                    <i class="fas fa-shield-alt text-success"></i>
+                    <h3 data-i18n="feature_privacy">خصوصية كاملة</h3>
+                    <p data-i18n="feature_privacy_desc">بياناتك آمنة 100%. لا يتم حفظ أي بيانات على أي سيرفر.</p>
+                </div>
+                <div class="feature-card glass-card">
+                    <i class="fas fa-copy text-accent"></i>
+                    <h3 data-i18n="feature_copy">نسخ أكاديمي</h3>
+                    <p data-i18n="feature_copy_desc">نسخ مباشر لجميع الجداول بتنسيق أكاديمي (APA) لملفات Word.</p>
+                </div>
+                <div class="feature-card glass-card">
+                    <i class="fas fa-robot text-purple"></i>
+                    <h3 data-i18n="feature_ai">تعليق ذكي</h3>
+                    <p data-i18n="feature_ai_desc">المساعد الذكي (Gemini) جاهز لكتابة التعليق العلمي تحت كل جدول.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Application Wizard -->
+        <section id="wizard-section" class="hidden">
+            <!-- Stepper -->
+            <div class="stepper">
+                <div class="step active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label" data-i18n="step1_title">رفع الملف</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step" data-step="2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label" data-i18n="step2_title">تعريف المتغيرات</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step" data-step="3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label" data-i18n="step3_title">مراجعة وتشغيل</div>
+                </div>
+            </div>
+
+            <!-- Step 1: Upload -->
+            <div id="step-1" class="wizard-content active fade-up">
+                <div class="upload-area glass-card" id="drop-zone">
+                    <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                    <h3 data-i18n="upload_prompt">اسحب وأفلت ملف البيانات هنا أو اضغط للاختيار</h3>
+                    <p data-i18n="supported_files" class="text-muted">الامتدادات المدعومة: xlsx, xls, csv</p>
+                    <input type="file" id="file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" hidden>
+                </div>
+
+                <div id="file-info" class="hidden glass-card mt-4">
+                    <div class="file-details">
+                        <i class="fas fa-file-excel fa-2x text-success"></i>
+                        <div>
+                            <h4 id="filename">data.xlsx</h4>
+                            <p id="file-stats" class="text-muted">150 rows • 12 columns</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="quality-report-box" class="hidden glass-card mt-4 warning-card">
+                    <h4><i class="fas fa-exclamation-triangle"></i> <span data-i18n="data_quality_report">تقرير جودة البيانات</span></h4>
+                    <div id="quality-issues" class="issues-list"></div>
+                </div>
+
+                <div class="wizard-actions mt-4 text-left">
+                    <button id="btn-next-1" class="btn-primary" disabled><span data-i18n="next">التالي</span></button>
+                </div>
+            </div>
+
+            <!-- Step 2: Variables Definition (Redesigned) -->
+            <div id="step-2" class="wizard-content hidden fade-up">
+                
+                <!-- Available Columns Panel -->
+                <div class="glass-card mb-4">
+                    <h5><i class="fas fa-columns text-accent"></i> <span data-i18n="available_cols">الأعمدة المتاحة في الملف:</span></h5>
+                    <p class="text-muted text-sm mb-3" data-i18n="cols_hint">اضغط على أي عمود لإضافته للمتغيرات الديموغرافية</p>
+                    <div id="available-columns" class="chips-container"></div>
+                </div>
+
+                <div class="var-builder-layout">
+                    <!-- Demographic Section (compact) -->
+                    <div class="glass-card demo-panel">
+                        <h4><i class="fas fa-users text-purple"></i> <span data-i18n="demo_vars_label">المتغيرات الديموغرافية</span></h4>
+                        <p class="text-muted text-sm" data-i18n="demo_hint">مثل: الجنس، العمر، المستوى الدراسي</p>
+                        <div id="demo-vars-container" class="chips-container empty-state-box mt-2">
+                            <span class="text-muted text-sm" data-i18n="no_demo_selected">لا يوجد متغيرات ديموغرافية محددة</span>
+                        </div>
+                    </div>
+
+                    <!-- Core Variables (main area) -->
+                    <div class="glass-card vars-panel">
+                        <div class="flex-between mb-3">
+                            <h4><i class="fas fa-flask text-accent"></i> <span data-i18n="likert_vars_label">متغيرات الدراسة الأساسية</span></h4>
+                            <button id="add-var-btn" class="btn-primary btn-sm"><i class="fas fa-plus"></i> <span data-i18n="add_variable">إضافة متغير</span></button>
+                        </div>
+                        
+                        <div id="core-variables-list" class="variables-list">
+                            <!-- Variable cards injected here -->
+                        </div>
+
+                        <div id="empty-vars-hint" class="empty-vars-hint text-center p-5">
+                            <i class="fas fa-hand-pointer fa-2x text-muted mb-3"></i>
+                            <p class="text-muted" data-i18n="add_var_hint">اضغط "إضافة متغير" لبدء تعريف متغيرات الدراسة</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Missing Values Settings -->
+                <div class="glass-card mt-4">
+                    <h5 data-i18n="missing_values_method">طريقة التعامل مع القيم المفقودة:</h5>
+                    <div class="radio-group mt-2">
+                        <label class="radio-label">
+                            <input type="radio" name="missing_method" value="mean" checked> 
+                            <span data-i18n="mean_imputation">الاستبدال بالمتوسط</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="missing_method" value="drop"> 
+                            <span data-i18n="drop_rows">حذف الصفوف</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="wizard-actions mt-4 flex-between">
+                    <button class="btn-secondary btn-prev" data-i18n="prev">السابق</button>
+                    <button id="btn-next-2" class="btn-primary" data-i18n="next">التالي</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Run -->
+            <div id="step-3" class="wizard-content hidden fade-up text-center">
+                <div class="glass-card run-card p-5">
+                    <i class="fas fa-rocket fa-4x mb-4 text-purple rocket-icon"></i>
+                    <h2 class="mb-3" data-i18n="ready_to_run">جاهز للتحليل!</h2>
+                    <div id="summary-text" class="text-muted mb-4"></div>
+                    
+                    <button id="run-analysis-btn" class="btn-primary btn-large glow-effect">
+                        <span data-i18n="run_analysis">تشغيل التحليل الآن 🚀</span>
+                    </button>
+
+                    <div id="progress-container" class="mt-4 hidden">
+                        <div class="progress-bar-bg">
+                            <div id="progress-bar-fill" class="progress-bar-fill"></div>
+                        </div>
+                        <p id="progress-text" class="mt-2 text-muted" data-i18n="processing">جاري المعالجة...</p>
+                    </div>
+                </div>
+                
+                <div class="wizard-actions mt-4 text-right">
+                    <button class="btn-secondary btn-prev" data-i18n="prev">السابق</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Dashboard -->
+        <section id="results-section" class="hidden fade-in">
+            <div class="results-header flex-between mb-4">
+                <h2 data-i18n="results_dashboard">لوحة النتائج</h2>
+                <div class="btn-group">
+                    <button id="btn-fix-data" class="btn-warning"><i class="fas fa-magic"></i> <span data-i18n="data_fix">أداة تحسين البيانات 🪄</span></button>
+                    <button id="btn-new-analysis" class="btn-secondary"><i class="fas fa-plus"></i></button>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="quick-stats grid-4 mb-4" id="kpi-cards"></div>
+
+            <!-- Section: Cronbach's Alpha -->
+            <div class="glass-card result-card mb-4" id="section-alpha">
+                <div class="card-header flex-between">
+                    <h3 data-i18n="cronbach_alpha">تحليل الثبات (ألفا كرونباخ)</h3>
+                    <div class="actions">
+                        <button class="btn-icon text-accent copy-btn" data-target="table-alpha" title="نسخ للبحث"><i class="fas fa-copy"></i></button>
+                        <button class="btn-icon text-purple ai-btn" data-target="section-alpha" title="توليد تعليق أكاديمي"><i class="fas fa-robot"></i></button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="academic-table" id="table-alpha">
+                        <thead><tr><th data-i18n="col_var">المتغير</th><th data-i18n="col_items_count">عدد الأسئلة</th><th data-i18n="col_alpha">ألفا كرونباخ</th><th data-i18n="col_interpretation">التفسير</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="ai-commentary hidden mt-3 p-3 bg-darker rounded"></div>
+            </div>
+
+            <!-- Section: Descriptive -->
+            <div class="glass-card result-card mb-4" id="section-desc">
+                <div class="card-header flex-between">
+                    <h3 data-i18n="descriptive_stats">التحليل الوصفي للمتغيرات الأساسية</h3>
+                    <div class="actions">
+                        <button class="btn-icon text-accent copy-btn" data-target="table-desc" title="نسخ للبحث"><i class="fas fa-copy"></i></button>
+                        <button class="btn-icon text-purple ai-btn" data-target="section-desc" title="توليد تعليق أكاديمي"><i class="fas fa-robot"></i></button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="academic-table" id="table-desc">
+                        <thead><tr><th data-i18n="col_var">المتغير</th><th data-i18n="col_n">العدد (N)</th><th data-i18n="col_mean">المتوسط</th><th data-i18n="col_std">الانحراف المعياري</th><th data-i18n="col_median">الوسيط</th><th data-i18n="col_min">الحد الأدنى</th><th data-i18n="col_max">الحد الأقصى</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="ai-commentary hidden mt-3 p-3 bg-darker rounded"></div>
+            </div>
+
+            <!-- Section: Demographic Charts -->
+            <div id="demographic-charts-container" class="grid-2 mb-4"></div>
+
+            <!-- Section: Correlation -->
+            <div class="glass-card result-card mb-4" id="section-corr">
+                <div class="card-header flex-between">
+                    <h3 data-i18n="correlation">تحليل الارتباط (Pearson)</h3>
+                    <div class="actions">
+                        <button class="btn-icon text-accent copy-btn" data-target="table-corr" title="نسخ للبحث"><i class="fas fa-copy"></i></button>
+                        <button class="btn-icon text-success" onclick="Charts.downloadChart('correlation-heatmap', 'Correlation Heatmap')" title="تنزيل الرسمة"><i class="fas fa-download"></i></button>
+                        <button class="btn-icon text-purple ai-btn" data-target="section-corr" title="توليد تعليق أكاديمي"><i class="fas fa-robot"></i></button>
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="table-responsive" style="max-height: 400px; overflow:auto">
+                        <table class="academic-table" id="table-corr">
+                            <thead></thead><tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="correlation-heatmap"></canvas>
+                    </div>
+                </div>
+                <div class="ai-commentary hidden mt-3 p-3 bg-darker rounded"></div>
+            </div>
+
+            <!-- Section: Regression Models -->
+            <div id="regression-results-container"></div>
+
+            <!-- Section: Regression Diagnostics Charts -->
+            <div id="regression-diagnostics-container" class="mb-4"></div>
+
+        </section>
+
+    </main>
+
+    <!-- Data Fix Modal (Data Optimizer) -->
+    <div id="data-fix-modal" class="modal hidden">
+        <div class="modal-dialog glass-card modal-lg">
+            <h3 data-i18n="data_fix" class="mb-3 text-warning">أداة تحسين البيانات 🪄</h3>
+            <p data-i18n="fix_data_prompt" class="mb-4 text-muted">إذا كانت النتائج ضعيفة وتضعف بحثك، يمكنك استخدام هذه الأداة لتوليد بيانات بديلة تملك خصائص إحصائية نموذجية تماماً.</p>
+            
+            <div class="form-group">
+                <label class="mb-2 block"><span data-i18n="target_sample_size">حجم العينة المطلوب</span>: <span id="sample-size-val" class="sample-size-badge">200</span></label>
+                <input type="range" id="sample-size-range" min="50" max="1000" step="10" value="200" class="range-slider w-full">
+            </div>
+
+            <div class="text-center mt-5">
+                <button id="btn-close-fix" class="btn-secondary ml-2" data-i18n="cancel">إلغاء</button>
+                <button id="btn-execute-fix" class="btn-warning glow-effect"><i class="fas fa-bolt"></i> <span data-i18n="generate_data">توليد وتنزيل البيانات</span></button>
+            </div>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 25px; margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.05); color: var(--text-muted); font-size: 0.9em; font-weight: 500;">
+        <p data-i18n="copyright">حقوق هذا الموقع ترجع لـ م. محمد عاصم &copy; 2024</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/i18n.js?v=3"></script>
+    <script src="js/copyFormatting.js?v=3"></script>
+    <script src="js/geminiAI.js?v=3"></script>
+    <script src="js/fileParser.js?v=3"></script>
+    <script src="js/charts.js?v=3"></script>
+    <script src="js/app.js?v=3"></script>
+
+</body>
+</html>
