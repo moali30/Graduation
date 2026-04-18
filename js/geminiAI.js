@@ -100,7 +100,7 @@ ${JSON.stringify(dataJson)}`;
                 : `اكتب تعليقاً أكاديمياً باللغة العربية يشرح هذه البيانات:\n${noLatexRule}\n${JSON.stringify(dataJson)}`;
         }
 
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`;
         
         try {
             const response = await fetch(apiUrl, {
