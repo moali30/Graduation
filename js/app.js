@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
             next1Btn.disabled = false;
         } catch (error) {
             console.error(error);
-            alert(window.i18n.lang === 'en' ? "Error reading file!" : "حدث خطأ أثناء قراءة الملف");
+            alert((window.i18n.lang === 'en' ? "Error reading file! " : "حدث خطأ أثناء قراءة الملف: ") + (error.message || ''));
             dropZone.innerHTML = `<i class="fas fa-times-circle fa-3x text-danger"></i><h3 class="mt-3 text-danger">حدث خطأ. حاول مرة أخرى.</h3>`;
         }
     }
