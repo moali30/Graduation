@@ -1,65 +1,63 @@
 class FileParser {
     static async readExcelFile(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
+        try {
+            if (!file || file.size === 0) {
+                throw new Error("File is empty (size is 0 bytes)");
+            }
+
+            const arrayBuffer = await file.arrayBuffer();
+            const data = new Uint8Array(arrayBuffer);
             
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, {type: 'array'});
-                    
-                    // Assume the first sheet is the one we want
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    
-                    // Convert to raw JSON arrays to get header easily
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
-                    
-                    if (jsonData.length < 2) {
-                        throw new Error("File is empty or doesn't have headers");
+            if (typeof XLSX === 'undefined') {
+                throw new Error("XLSX library failed to load. Please check your internet connection or disable adblockers.");
+            }
+
+            const workbook = XLSX.read(data, {type: 'array'});
+            
+            // Assume the first sheet is the one we want
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            
+            // Convert to raw JSON arrays to get header easily
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+            
+            if (!jsonData || jsonData.length < 2) {
+                throw new Error("File is empty or doesn't have headers");
+            }
+            
+            // First row is headers
+            const columnsRaw = jsonData[0];
+            // Clean columns (remove empty)
+            const columns = columnsRaw.map(c => c !== undefined && c !== null ? String(c).trim() : '').filter(c => c !== '');
+            
+            // Map the rest of the data to objects
+            const rows = [];
+            for(let i=1; i<jsonData.length; i++) {
+                const rowArr = jsonData[i];
+                if (!rowArr || rowArr.length === 0) continue;
+                
+                const rowObj = {};
+                let hasData = false;
+                for(let j=0; j<columns.length; j++) {
+                    const val = rowArr[j];
+                    if (val !== undefined && val !== null && val !== '') {
+                        rowObj[columns[j]] = val;
+                        hasData = true;
+                    } else {
+                        rowObj[columns[j]] = null;
                     }
-                    
-                    // First row is headers
-                    const columnsRaw = jsonData[0];
-                    // Clean columns (remove empty)
-                    const columns = columnsRaw.map(c => c ? String(c).trim() : '').filter(c => c !== '');
-                    
-                    // Map the rest of the data to objects
-                    const rows = [];
-                    for(let i=1; i<jsonData.length; i++) {
-                        const rowArr = jsonData[i];
-                        if (!rowArr || rowArr.length === 0) continue;
-                        
-                        const rowObj = {};
-                        let hasData = false;
-                        for(let j=0; j<columns.length; j++) {
-                            const val = rowArr[j];
-                            if (val !== undefined && val !== null && val !== '') {
-                                rowObj[columns[j]] = val;
-                                hasData = true;
-                            } else {
-                                rowObj[columns[j]] = null;
-                            }
-                        }
-                        if (hasData) rows.push(rowObj);
-                    }
-                    
-                    resolve({
-                        columns: columns,
-                        data: rows,
-                        rowCount: rows.length
-                    });
-                } catch (err) {
-                    reject(err);
                 }
-            };
+                if (hasData) rows.push(rowObj);
+            }
             
-            reader.onerror = function() {
-                reject(new Error("Failed to read the file"));
+            return {
+                columns: columns,
+                data: rows,
+                rowCount: rows.length
             };
-            
-            reader.readAsArrayBuffer(file);
-        });
+        } catch (err) {
+            throw err;
+        }
     }
 
     static generateQualityReport(data, columns) {
